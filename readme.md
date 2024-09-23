@@ -124,7 +124,7 @@ Topics covered:
  - an everything and a kitchensink demo
 
 ### 3D Printable button project
-3D printable STLs alongside with instruction how to build a button can be found in `TouchLed/extras` and on [Thingiverse](https://www.thingiverse.com/thing:6772678).
+3D printable STLs alongside with instruction how to build a button can be found in [TouchLed/extras](TouchLed/extras) and on [Thingiverse](https://www.thingiverse.com/thing:6772678).
 
 ![Button Design (Outside)](img/outside.jpg)
 ![Button Design (Inside)](img/inside.jpg)
