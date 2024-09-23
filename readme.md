@@ -58,7 +58,7 @@ To install the TouchLed library:
  
 or
 
- - download [TouchLed.h](https://raw.githubusercontent.com/bwucke/TouchLed/refs/heads/main/TouchLed/src/TouchLed.h) and put it into your sketch directory next to the .ino file
+ - download [TouchLed.h](https://github.com/bwucke/TouchLed/blob/main/TouchLed/src/TouchLed.h) and put it into your sketch directory next to the .ino file
  
 
 ## Calibration
