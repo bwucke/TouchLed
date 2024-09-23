@@ -21,10 +21,11 @@ class TouchButton {
       toggledCallback(NULL),
       releasedCallback(NULL),
       longpressCallback(NULL),
+      taskHandle(NULL),
       ledBehavior(PUSH),
       LedSetState(false),
       reversePolarity(false),
-      twoWire(true)
+      threeWire(false)
   {}
 	  
   ~TouchButton() {
@@ -39,19 +40,23 @@ class TouchButton {
   };
   
   void begin() {
-    xTaskCreate(
-      TouchButton::recalculateTask,
-      "TouchButtonTask",
-      2048,
-      this,
-      1,
-      &taskHandle
-    );
+    if(taskHandle == NULL)
+    {
+      xTaskCreate(
+        TouchButton::recalculateTask,
+        "TouchButtonTask",
+        2048,
+        this,
+        1,
+        &taskHandle
+      );
+    }
   }
   
   void end() {
     if (taskHandle != NULL) {
       vTaskDelete(taskHandle);
+      taskHandle = NULL;
     }
   }
 
@@ -68,21 +73,23 @@ class TouchButton {
   void recalculate()
   {
 
-    if(twoWire) 
-    { // Two
-      pinMode(sinkPin, INPUT); // put sink into high impedance mode
+    if(!threeWire) 
+    {  // Standard 2-wire operation
+      pinMode(sinkPin, INPUT); // put sink into high impedance mode, for readout
 
       touchValue = touchRead(touchPin);
   
-      pinMode(sinkPin, OUTPUT); // make sink a GND. 
-      digitalWrite(sinkPin, 0);// !reversePolarity ); // make sink a GND. 
+      pinMode(sinkPin, OUTPUT); // make sink a GND for the LED. 
+      digitalWrite(sinkPin, reversePolarity ); 
       
-      pinMode(touchPin, OUTPUT);  // set the LED
-      digitalWrite(touchPin, computeLed() ); //^ reversePolarity);
+      pinMode(touchPin, OUTPUT);  // set the LED 
+      digitalWrite(touchPin, computeLed());
     }
     else  
-    { // 3-wire op: LED between sink and GND, touch to touchpad.
-      threeWireOp();
+    { // 3-wire op: LED between sink and GND (or 3.3V with reversePolarity), touch to touchpad.
+      touchValue = touchRead(touchPin);
+      pinMode(sinkPin, OUTPUT); // make sink a GND. 
+      digitalWrite(sinkPin,  computeLed() );
     }
 
     // hysteresis processing of on/off readout
@@ -125,31 +132,30 @@ class TouchButton {
 
   bool computeLed()
   {
+    bool on = false;
     switch(ledBehavior)
     {
       case PUSH:
-        return pressed;
+        on = pressed;
+        break;
       case PUSH_INVERTED:
-        return !pressed;
+        on = !pressed;
+        break;
       case TOGGLE:
-        return toggleIsOn;
+        on = toggleIsOn;
+        break;
       case MANUAL:
-        return LedSetState;
+        on = LedSetState;
+        break;
     }
-  }
-
-  bool threeWireOp()
-  {
-    touchValue = touchRead(touchPin);
-    pinMode(sinkPin, OUTPUT); // make sink a GND. 
-    digitalWrite(sinkPin, computeLed() );// !reversePolarity ); // make sink a GND. 
+    return on ^ reversePolarity;
   }
 
   inline bool LongPressed() { return longpressed; };
   inline bool Pressed() { return pressed; };
   inline bool Toggled() { return toggleIsOn; };
   inline void SetLedBehavior(LedBehavior behavior) { ledBehavior = behavior; }
-  inline void SetLedState(bool state) { LedSetState = state; if(!twoWire){threeWireOp();} }
+  inline void SetLedState(bool state) { LedSetState = state; }
 
   int touchPin;
   int sinkPin;
@@ -171,6 +177,6 @@ class TouchButton {
   LedBehavior ledBehavior;
   bool LedSetState;
   bool reversePolarity;   // AKA "I soldered the LED backwards"
-  bool twoWire;   // Set to false for 3-wire operation, Touch only goes to touch pad, Led is between Sink and Gnd.
+  bool threeWire;   // Set to false for 3-wire operation, Touch only goes to touch pad, Led is between Sink and Gnd.
 };
 

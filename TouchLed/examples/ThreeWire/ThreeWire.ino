@@ -32,24 +32,16 @@ TouchButton button(T0, 5);
 // Event handler. Blink the button LED 3 times then return it to the default state.
 void onTouch()
 {
-  button.SetLedBehavior(TouchButton::MANUAL);
-  for(int i=0; i<3;++i)
-  {
-    digitalWrite(LED_BUILTIN, 1);
-    delay(50);
-    digitalWrite(LED_BUILTIN, 0);
-    delay(50);
-  }
-  // restore the default behavior.
-  button.SetLedBehavior(TouchButton::PUSH);
+  digitalWrite(LED_BUILTIN, 1);
+  delay(50);
+  digitalWrite(LED_BUILTIN, 0);
 }
 
 
 void setup() {
-  Serial.begin(115200);
-
+  pinMode(LED_BUILTIN, OUTPUT);
   // Disable the 3-wire op.
-  button.twoWire = false;
+  button.threeWire = true;
   // initialize Callback
   button.pressedCallback = onTouch;
   // Start polling/control job in the background (a FreeRTOS task)

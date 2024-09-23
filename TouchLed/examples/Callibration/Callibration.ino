@@ -7,7 +7,6 @@
   
 */ 
 
-
 // Adjust to match where you've connected them.
 
 const int touchPin = 4;   //T0
