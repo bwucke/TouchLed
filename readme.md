@@ -54,7 +54,7 @@ Can it be made not to blink and still work with two wires? Probably, but it woul
 ## Installation
 
 To install the TouchLed library:
- - Find TouchLed in the Arduino library manager and add it to Arduino IDE, 
+ - Find TouchLed in the Arduino library manager and add it to Arduino IDE *(pending)*, 
  
 or
 
